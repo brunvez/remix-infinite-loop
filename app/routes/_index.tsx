@@ -1,7 +1,8 @@
 import { defer, type LoaderFunction, type MetaFunction } from "@remix-run/node";
 import { Suspense } from 'react'
 import { useLoaderData, Await } from "@remix-run/react";
-import Numbers from "~/components/Numbers";
+import Odds from "~/components/Odds";
+import Evens from "~/components/Evens";
 
 export const meta: MetaFunction = () => {
   return [
@@ -15,8 +16,9 @@ export const loader: LoaderFunction = () => {
     setTimeout(() => resolve([1, 3, 5]), 200)
   })
 
+  // Fallback will be visible until this is resolved
   const evens = new Promise((resolve) => {
-    setTimeout(() => resolve([2, 4, 6]), 200)
+    setTimeout(() => resolve([2, 4, 6]), 3000)
   })
 
   return defer({
@@ -59,10 +61,17 @@ export default function Index() {
             }
           >
             <Await
-              resolve={Promise.all([odds, evens])}
+              resolve={odds}
             >
-              {([odds, evens]) => (
-                <Numbers odds={odds as number[]} evens={evens as number[]}/>
+              {(odds) => (
+                <Odds numbers={odds as number[]}/>
+              )}
+            </Await>
+            <Await
+              resolve={evens}
+            >
+              {(evens) => (
+                <Evens numbers={evens as number[]}/>
               )}
             </Await>
           </Suspense>
